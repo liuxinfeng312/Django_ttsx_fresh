@@ -3,6 +3,8 @@ import random
 import time
 
 from django.core.cache import cache
+from django.core.paginator import Paginator
+
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
@@ -180,7 +182,11 @@ def order(request):#订单模板
     if userid:
         user = User.objects.get(pk=userid)
         response_data['user'] = user
+        page=int(request.GET.get('page',1))
         orders=user.orderinfo_set.all()
+        p=Paginator(orders,3)
+        orders=p.page(page)
+
         response_data['orders']=orders
 
     return render(request,'user_center_order.html',context=response_data)
@@ -209,7 +215,9 @@ def cart(request):#购物车
         response_data['sum']=sum
         response_data['num']=num
 
-    return render(request,'cart.html',context=response_data)
+        return render(request,'cart.html',context=response_data)
+
+    return redirect('shop:login')
 
 
 def placeorder(request):
@@ -308,14 +316,42 @@ def addcart(request):
 
         shopcarts1 = ShoppingCart.objects.filter(user=user)  # 如果有登陆先获取用户购物车数量
         response_data['goodsnum'] = str(len(shopcarts1))
-        print('当前购物车数量' + str(len(shopcarts1)))
+
 
         response_data['msg']='success'
         response_data['statue']='1'
         response_data['good']=shopcart.user.username+'添加'+shopcart.goods.name+' 成功，数量为：'+str(shopcart.nums)+'当前购物车数量' + str(len(shopcarts1))
         return JsonResponse(response_data)
-    return render(request,'login.html')
+
     # return redirect('shop:login')
+
+#立即购买
+def bug(request):
+    token = request.session.get('token')
+    userid = cache.get(token)
+
+    response_data = {
+        # 'user':None
+    }
+    if userid:#用户登陆后的情况
+        print(userid)
+
+        user = User.objects.get(pk=userid)
+        goodid = request.GET.get('goodid')
+        good = Goods.objects.get(pk=goodid)
+
+        shopcart = ShoppingCart()
+        shopcart.goods = good
+        shopcart.user = user
+        goodnum = int(request.GET.get('goodnum'))
+        shopcart.nums = goodnum
+        shopcart.save()
+        response_data['msg'] = 'success'
+        response_data['statue'] = '1'
+
+        return JsonResponse(response_data)
+
+
 ###########################
 #改变购物车的商品数量
 
@@ -439,6 +475,10 @@ def neworder(request):
         response_data['user'] = user
         shopcarts=user.shoppingcart_set.all()#用户购物车
         #遍历 取出商品总价
+        # print(shopcarts.first()is None)
+        if shopcarts.first() ==None:
+            return redirect('shop:cart')
+
         allprice=0
         for shopcart in shopcarts:
             allprice=allprice+(shopcart.nums*shopcart.goods.shop_price)
@@ -474,7 +514,8 @@ def neworder(request):
             ordergoods.save()
             shopcart.delete()
 
-    return redirect('shop:placeorder')
+        return redirect('shop:placeorder')
+    return redirect('shop:login')
 
 
 

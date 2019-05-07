@@ -61,7 +61,7 @@
 			<h3>{{ good.name }}</h3>
 			<p>{{ good.goods_brief }}</p>
 			<div class="prize_bar">
-				<span class="show_pirze">¥<em>{{ good.shop_price }}</em></span>
+				<span class="show_pirze">¥<em id="price">{{ good.shop_price }}</em></span>
 				<span class="show_unit">单  位：500g</span>
 			</div>
 			<div class="goods_num clearfix">
@@ -74,9 +74,9 @@
 					<a href="javascript:;" class="minus fr">-</a>	
 				</div> 
 			</div>
-			<div class="total">总价：<em>16.80元</em></div>
+			<div class="total">总价：<em id="allprice">{{ good.shop_price }}</em>元</div>
 			<div class="operate_btn">
-				<a href="javascript:;" class="buy_btn">立即购买</a>
+				<a href="{% url 'shop:neworder' %}" class="buy_btn"  data-id="{{ good.id }}" >立即购买</a>
 				<a href="javascript:;" class="add_cart" id="add_cart" data-id="{{ good.id }}">加入购物车</a>
 			</div>
 		</div>

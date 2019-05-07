@@ -22,6 +22,8 @@ urlpatterns=[
     url(r'^delgoods/$',views.delgoods,name='delgoods'),
     #生成订单
     url(r'^neworder/$',views.neworder,name='neworder'),
+    #立即购买
+    url(r'^bug/$',views.bug,name='bug')
 
 
 ]

@@ -62,7 +62,7 @@
 							<td width="15%">
                                {% for goods in order.goods.all %}
                                             {% widthratio goods.goods_nums 1 goods.goods.shop_price %}
-                                                        {% endfor %}   }}
+                                                        {% endfor %}
 							<td width="15%">待付款</td>
 							<td width="15%"><a href="#" class="oper_btn">去付款</a></td>
 						</tr>
@@ -130,13 +130,24 @@
 {#				</table>#}
 
 				<div class="pagenation">
-					<a href="#">上一页</a>
-					<a href="#" class="active">1</a>
-					<a href="#">2</a>
-					<a href="#">3</a>
-					<a href="#">4</a>
-					<a href="#">5</a>
-					<a href="#">下一页></a>
+                    <a>当前页面：{{ orders.number }}</a>
+                    <a>总页码：{{ orders.paginator.num_pages }}</a>
+                    {% if orders.has_previous %}
+                    <a href="{% url 'shop:order' %}?page={{ orders.previous_page_number }}">上一页</a>
+                    {% endif %}
+                {% for i in orders.paginator.page_range %}
+                <a href="{% url 'shop:order' %}?page={{ i }}"  class="active">{{ i }}</a>
+                {% endfor %}
+
+{#					<a href="#">1</a>#}
+{#					<a href="#">2</a>#}
+{#					<a href="#">3</a>#}
+{#					<a href="#">4</a>#}
+{#					<a href="#">5</a>#}
+                {% if orders.has_next %}
+                <a href="{% url 'shop:order' %}?page={{ orders.next_page_number }} ">下一页></a>
+                {% endif %}
+
 				</div>
 		</div>
 	</div>
